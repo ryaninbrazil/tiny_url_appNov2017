@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <% include ./partials/_header %>
+    <h4>Submit URL for shortening</h4>
+    <input/>
+    <button>Submit URL</button>
+   <br>
+   <br>
+   <br>
+    <table>
+      <tr>
+        <th>List of Shortened URLS</th> 
+      </tr>
+      <tr>
+        <td> <% for(var shortURL in urls){ %>
+          <p><%= shortURL %> - <%= urls[shortURL]%></p>
+        <% } %></td>
+        
+      </tr>
+    </table>
+</body>
+</html>
