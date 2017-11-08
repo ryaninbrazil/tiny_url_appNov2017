@@ -8,7 +8,10 @@
   <table>
     <tr>
       <td><%= shortURL %></td><td><a href="<%= longURL %>"><%= longURL %></a> </td>
-      </tr>
+      </tr> <form method="POST" action="/urls/<%= shortURL %>">
+        <input type="text" name="longURL" value="<%= longURL %>">
+        <button>Update</button>
+      </form>
       </table>
 </body>
 </html>

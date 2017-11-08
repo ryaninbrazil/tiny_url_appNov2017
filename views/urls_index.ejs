@@ -18,6 +18,12 @@
       <tr>
         <td> <% for(var shortURL in urls){ %>
           <p><%= shortURL %> - <%= urls[shortURL]%></p>
+          <form method="POST" action="/urls/<%= shortURL %>/delete">
+            <button>Delete</button>
+            </form>
+            <form method="GET" action="/urls/<%= shortURL %>/">
+              <button>Edit</button>
+              </form>
         <% } %></td>
         
       </tr>
