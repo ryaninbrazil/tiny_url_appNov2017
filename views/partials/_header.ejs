@@ -5,6 +5,15 @@
 <body>
   <header> 
     <h1>Tiny APP</h1>
+    <h3>USERNAME: <%=username%></h3>
+    <form method="POST" action="/login">
+      <input type="text" name="username"> 
+      <button type="submit">Sign In</button>
+
+      <form method="POST" action="/logout">
+        <button type="submit">Sign Out</button>
+      </form>
+    </form>
   </header>
 </body>
 </html>
