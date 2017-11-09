@@ -5,6 +5,22 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
+
+
 function generateRandomString() {
   let password = "";
   let randomizer = "abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
@@ -18,6 +34,7 @@ function generateRandomString() {
   return password;
   };
 
+
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -25,6 +42,10 @@ var urlDatabase = {
 
 app.get("/", (req, res) => {
   res.end("Hello!");
+});
+
+app.get("/register", (req, res) => {
+  res.render("registration");
 });
 
 app.get("/urls", (req, res) => {
@@ -48,6 +69,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -60,7 +82,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  let shortURL = req.params.id;;
+  let shortURL = req.params.id;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
@@ -72,9 +94,27 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");  
 });
 
-// app.get("/hello", (req, res) => {
-//   res.end("<html><body>Hello <b>World</b></body></html>\n");
-// });
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body["username"]);
+  res.redirect("/urls"); 
+});  
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username", req.body["username"]);
+  res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  let userEmail = req.body.email;
+  let userPass = req.body.password;
+  let userID = generateRandomString()
+  users[userID] = {
+    id: userID, email: userEmail, password: userPass
+  };
+  console.log(users);
+  res.redirect("/urls");
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
