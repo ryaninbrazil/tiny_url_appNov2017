@@ -61,6 +61,8 @@ function findUser(email) {
       return user;
     }
   }
+
+  return false;
 };
 
 app.get("/", (req, res) => {
@@ -107,9 +109,13 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  let user = users[req.cookies["user_id"]];
   let shortURL = generateRandomString();
   let longURL = req.body["longURL"];
-  urlDatabase[shortURL] = longURL; // writing
+  urlDatabase[shortURL] = longURL;
+  if (!user) {
+    res.redirect("/register");
+  } else 
   res.redirect("/urls/" + shortURL);  
 });
 
@@ -127,13 +133,13 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  let user = users[req.cookies["user_id"]];
   const email = req.body.email;
   const password = req.body.password;
-  if (!userAlreadyExists(email)) {
+  const user = findUser(email);
+  
+  if (!user) {
     res.redirect("/register");  
-  } else if (user) {
-    const user = findUser(email);
+  } else {
     if (user.password === password)  {
       res.cookie('user_id', user.id);
       res.redirect('/urls');
@@ -144,7 +150,7 @@ app.post("/login", (req, res) => {
 });  
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id", req.body["user_id"]);
+  res.clearCookie("user_id");
   res.redirect("/login");
 });
 
