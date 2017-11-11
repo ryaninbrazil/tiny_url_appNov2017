@@ -20,7 +20,7 @@
       </tr>
       <tr>
         <td> <% for(var shortURL in urls){ %>
-          <p><%= shortURL %> - <%= urls[shortURL]%></p>
+          <p><%= shortURL %> - <%= urls[shortURL].url%></p>
           <form method="POST" action="/urls/<%= shortURL %>/delete">
             <button>Delete</button>
             </form>
@@ -31,6 +31,7 @@
         
       </tr>
     </table>
-  </center>
+  </center> 
+  <% include ./partials/_footer %>
 </body>
 </html>
