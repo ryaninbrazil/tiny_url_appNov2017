@@ -98,7 +98,7 @@ function urlsForUser(id) {
 
 //Renders Hello on Homepage of Local Server
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  res.redirect("/urls");
 });
 
 //URLS list page
@@ -142,7 +142,7 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].url;
-  res.render(longURL);
+  res.redirect(longURL);
 });
 
 //Login Page
@@ -162,6 +162,9 @@ app.post("/urls", (req, res) => {
   let user = users[req.session.user_id];
   let shortURL = generateRandomString();
   let longURL = req.body["longURL"];
+  if( longURL.indexOf("http://") < 0){
+    longURL = "http://" + longURL;
+  } 
   urlDatabase[shortURL] = {
     url: longURL,
     userId: user.id
@@ -177,12 +180,15 @@ app.post("/urls", (req, res) => {
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   let user = users[req.session.user_id];
+  if (!user) {
+    res.redirect("/login");
+  }
   let shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === user.id) {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
   } else { 
-    return res.send(403, "Not Valid User!");
+    return res.render(403, "Not Valid User!");
   }
 });
 
@@ -190,6 +196,9 @@ app.post("/urls/:id/delete", (req, res) => {
 //Short URL ID page
 app.post("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
+  if (!user) {
+    res.redirect("/login");
+  }
   let shortURL = req.params.id;;
   let longURL = req.body["longURL"];
   if (urlDatabase[shortURL].userId === user.id) {
