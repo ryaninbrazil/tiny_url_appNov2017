@@ -97,6 +97,12 @@ function urlsForUser(id) {
 
 
 //Renders Hello on Homepage of Local Server
+
+app.get ("/error", (req, res) => {
+  res.redirect("/urls");
+});
+
+
 app.get("/", (req, res) => {
   res.redirect("/urls");
 });
@@ -120,6 +126,9 @@ app.get("/urls", (req, res) => {
 //New URLS Page
 app.get("/urls/new", (req, res) => {
   let user = users[req.session.user_id];
+  if (!user) {
+    return res.redirect("/login");
+  }
   let templateVars = { 
     user: user 
   };
@@ -130,6 +139,9 @@ app.get("/urls/new", (req, res) => {
 //URLS longURL
 app.get("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
+  if (!user) {
+    return res.redirect("/login");
+  }
   let shortURL = req.params.id;
   let templateVars = { user: user, 
     shortURL: shortURL, 
@@ -140,6 +152,10 @@ app.get("/urls/:id", (req, res) => {
 
 //Short URL page
 app.get("/u/:shortURL", (req, res) => {
+  let user = users[req.session.user_id];
+  if (!user) {
+    return res.redirect("/login");
+  }
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].url;
   res.redirect(longURL);
@@ -160,6 +176,9 @@ app.get("/urls.json", (req, res) => {
 //URLs Page
 app.post("/urls", (req, res) => {
   let user = users[req.session.user_id];
+  if (!user) {
+    return res.redirect("/login");
+  }
   let shortURL = generateRandomString();
   let longURL = req.body["longURL"];
   if( longURL.indexOf("http://") < 0){
@@ -182,30 +201,35 @@ app.post("/urls/:id/delete", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
+    return;
   }
   let shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === user.id) {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
   } else { 
-    return res.render(403, "Not Valid User!");
+    return res.redirect("/error");   
   }
 });
-
+//res.ridirect to error page that says cannot delete cause you're not a user
 
 //Short URL ID page
 app.post("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
+    return;
   }
-  let shortURL = req.params.id;;
   let longURL = req.body["longURL"];
+  if( longURL.indexOf("http://") < 0){
+    longURL = "http://" + longURL;
+  } 
+  let shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === user.id) {
     urlDatabase[shortURL].url = longURL;
     res.redirect("/urls");
   } else {
-    return res.send(403, "Not Valid User!");
+    return res.status(403, "Not Valid User!");
   }
 });
 
@@ -214,7 +238,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
   let userPass = req.body.password;
-  let user_id = findUser(userEmail);
+  let user = findUser(userEmail);
   const hashedPassword = bcrypt.hashSync(userPass, 10);
   if (userEmail === "" || userPass === ""){
     res.statusCode = 400; 
@@ -222,12 +246,7 @@ app.post("/login", (req, res) => {
   } else if (!userAlreadyExists(userEmail)) {
       res.redirect("/register");  
   } else if (userAlreadyExists(userEmail)) {
-    users[user_id] = {
-      id: user_id, 
-      email: userEmail, 
-      password: hashedPassword
-    };
-    req.session.user_id = user_id;
+    req.session.user_id = user.id;
   }
   res.redirect("/urls");
 });
