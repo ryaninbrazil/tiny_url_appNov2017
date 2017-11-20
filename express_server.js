@@ -2,23 +2,18 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
 //Middleware 
-
 //Body Parse to receive input from forms
 const bodyParser = require("body-parser");
-
 //Cookie Sessions secured
 const cookieSession = require('cookie-session')
 //Encrypted Password 
-
 const bcrypt = require('bcrypt');
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(cookieSession({
   name: 'session',
   keys: ['cookieSessionKey']
 }))
-
 
 //Global User Variable
 const users = { 
@@ -31,6 +26,18 @@ const users = {
     id: "user2RandomID", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  }
+};
+
+//Global Variable for URL database
+let urlDatabase = {
+  "b2xVn2": {
+    url: "http://www.lighthouselabs.ca",
+    userId: "userRandomID"
+  },
+  "9sm5xK": {
+    url: "http://www.google.com",
+    userId: "user2RandomID"
   }
 };
 
@@ -47,19 +54,6 @@ function generateRandomString() {
   }
   return password;
   };
-
-
-//Global Variable for URL database
- let urlDatabase = {
-  "b2xVn2": {
-    url: "http://www.lighthouselabs.ca",
-    userId: "userRandomID"
-  },
-  "9sm5xK": {
-    url: "http://www.google.com",
-    userId: "user2RandomID"
-  }
-};
 
 //Function to check for email in database for login
 function userAlreadyExists(email) {
@@ -82,7 +76,6 @@ function findUser(email) {
   return false;
 };
 
-
 //Function to show URL is created by which user
 function urlsForUser(id) {
   let userURLs = {};
@@ -94,9 +87,7 @@ function urlsForUser(id) {
   return userURLs
 };
 
-
-
-//Renders Hello on Homepage of Local Server
+//--------------------GET----------------------------------//
 
 app.get ("/error", (req, res) => {
   res.redirect("/urls");
@@ -107,12 +98,10 @@ app.get("/", (req, res) => {
   res.redirect("/urls");
 });
 
-//URLS list page
 app.get("/urls", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
     return res.status(401).send("You must be logged in to view urls. Please <a href='/login'>Login</a> or <a href='/register'>Register</a>");
-    // return res.redirect(401, "/urls");
   }
   let shortURL = req.params.id;;
   let longURL = req.body["longURL"];
@@ -124,7 +113,6 @@ app.get("/urls", (req, res) => {
 });
 
 
-//New URLS Page
 app.get("/urls/new", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
@@ -136,8 +124,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-
-//URLS longURL
 app.get("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
@@ -150,15 +136,12 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
-//Short URL page
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].url;
   res.redirect(longURL);
 });
 
-//Login Page
 app.get("/login", (req, res) => { 
   res.render("login");
 });
@@ -167,10 +150,8 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-
 //--------------------POST----------------------------------//
 
-//URLs Page
 app.post("/urls", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
@@ -192,8 +173,6 @@ app.post("/urls", (req, res) => {
   }
 });
 
-
-//Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
@@ -210,7 +189,6 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 //res.ridirect to error page that says cannot delete cause you're not a user
 
-//Short URL ID page
 app.post("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
@@ -230,7 +208,6 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-
 //Login Page to Set Cookies, Check for User in Database, and Matching HashedPassword
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
@@ -248,15 +225,11 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-
-//Logut of session and delete cookies
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect("/login");
+  res.redirect("/urls");
 });
 
-
-//Registration Page for Users
 app.post("/register", (req, res) => {
   let userEmail = req.body.email;
   let userPass = req.body.password;
@@ -279,14 +252,10 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-
-//Register Page 
 app.get("/register", (req, res) => {
   res.render("registration");
 });
 
-
-// The listening portal where the server waits for input.
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
