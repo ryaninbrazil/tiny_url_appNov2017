@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8080;
 const bodyParser = require("body-parser");
 
 //Cookie Sessions secured
-var cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session')
 //Encrypted Password 
 
 const bcrypt = require('bcrypt');
@@ -38,11 +38,11 @@ const users = {
 function generateRandomString() {
   let password = "";
   let randomizer = "abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
-  var passLength = randomizer.length;
+  let passLength = randomizer.length;
   if (!password) {
     password = ~~(Math.random() * passLength);
   }
-  for (var i = 0; i < 5; i++) {
+  for (let i = 0; i < 5; i++) {
     password += randomizer[~~(Math.random() * passLength) ];
   }
   return password;
@@ -50,7 +50,7 @@ function generateRandomString() {
 
 
 //Global Variable for URL database
-  var urlDatabase = {
+ let urlDatabase = {
   "b2xVn2": {
     url: "http://www.lighthouselabs.ca",
     userId: "userRandomID"
@@ -111,7 +111,8 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   let user = users[req.session.user_id];
   if (!user) {
-    return res.redirect("/login");
+    return res.status(401).send("You must be logged in to view urls. Please <a href='/login'>Login</a> or <a href='/register'>Register</a>");
+    // return res.redirect(401, "/urls");
   }
   let shortURL = req.params.id;;
   let longURL = req.body["longURL"];
@@ -152,10 +153,6 @@ app.get("/urls/:id", (req, res) => {
 
 //Short URL page
 app.get("/u/:shortURL", (req, res) => {
-  let user = users[req.session.user_id];
-  if (!user) {
-    return res.redirect("/login");
-  }
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].url;
   res.redirect(longURL);
@@ -190,7 +187,7 @@ app.post("/urls", (req, res) => {
   };
   if (!user) {
     res.redirect("/register");
-  } else  {
+  } else {
     res.redirect("/urls/" + shortURL);  
   }
 });
