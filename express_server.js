@@ -1,19 +1,23 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+
 //Middleware 
-//Body Parse to receive input from forms
 const bodyParser = require("body-parser");
-//Cookie Sessions secured
 const cookieSession = require('cookie-session')
-//Encrypted Password 
 const bcrypt = require('bcrypt');
+
+
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(cookieSession({
   name: 'session',
   keys: ['cookieSessionKey']
 }))
+
+
 
 //Global User Variable
 const users = { 
@@ -187,7 +191,6 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.redirect("/error");   
   }
 });
-//res.ridirect to error page that says cannot delete cause you're not a user
 
 app.post("/urls/:id", (req, res) => {
   let user = users[req.session.user_id];
@@ -208,7 +211,6 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-//Login Page to Set Cookies, Check for User in Database, and Matching HashedPassword
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
   let userPass = req.body.password;

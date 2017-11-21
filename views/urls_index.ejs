@@ -8,8 +8,8 @@
   <center>
     <br>
     <br>
-    <form method="get" action="/urls/new">
-      <button type="submit">Submit URL for shortening</button>
+  <form method="get" action="/urls/new">
+    <button type="submit">Submit URL for shortening</button>
   </form>
    <br>
    <br>
@@ -23,12 +23,11 @@
           <p><%= shortURL %> - <%= urls[shortURL].url%></p>
           <form method="POST" action="/urls/<%= shortURL %>/delete">
             <button>Delete</button>
-            </form>
-            <form method="GET" action="/urls/<%= shortURL %>/">
-              <button>Edit</button>
-              </form>
+          </form>
+          <form method="GET" action="/urls/<%= shortURL %>/">
+            <button>Edit</button>
+          </form>
         <% } %></td>
-        
       </tr>
     </table>
   </center> 
