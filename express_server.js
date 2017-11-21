@@ -104,7 +104,9 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let user = users[req.session.user_id];
+  console.log(user, req.session.user_id);
   if (!user) {
+    console.log('/urls: User not logged in!', user);
     return res.status(401).send("You must be logged in to view urls. Please <a href='/login'>Login</a> or <a href='/register'>Register</a>");
   }
   let shortURL = req.params.id;;
@@ -147,6 +149,9 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/login", (req, res) => { 
+  if (req.session.user_id) {
+    return res.redirect("/urls");
+  }
   res.render("login");
 });
 
@@ -163,7 +168,7 @@ app.post("/urls", (req, res) => {
   }
   let shortURL = generateRandomString();
   let longURL = req.body["longURL"];
-  if( longURL.indexOf("http://") < 0){
+  if (longURL.indexOf("http://") < 0 && longURL.indexOf("https://") < 0){
     longURL = "http://" + longURL;
   } 
   urlDatabase[shortURL] = {
@@ -199,9 +204,9 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
   let longURL = req.body["longURL"];
-  if( longURL.indexOf("http://") < 0){
+  if (longURL.indexOf("http://") < 0 && longURL.indexOf("https://") < 0) {    
     longURL = "http://" + longURL;
-  } 
+  }
   let shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === user.id) {
     urlDatabase[shortURL].url = longURL;
@@ -216,6 +221,7 @@ app.post("/login", (req, res) => {
   let userPass = req.body.password;
   let user = findUser(userEmail);
   const hashedPassword = bcrypt.hashSync(userPass, 10);
+
   if (userEmail === "" || userPass === ""){
     res.statusCode = 400; 
     res.send("400 Please enter a valid email address and password.");
@@ -224,6 +230,7 @@ app.post("/login", (req, res) => {
   } else if (userAlreadyExists(userEmail)) {
     req.session.user_id = user.id;
   }
+
   res.redirect("/urls");
 });
 
@@ -255,6 +262,10 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.session.user_id) {
+    return res.redirect("/urls");
+  }
+
   res.render("registration");
 });
 

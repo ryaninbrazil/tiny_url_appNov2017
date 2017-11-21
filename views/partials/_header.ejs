@@ -1,15 +1,17 @@
 <center>
-  <header> 
+  <header>
     <h1>Tiny APP</h1>
-      <% if (user) { %>
-      <h3>USERNAME: <%= user.email %></h3>
-        <form method="POST" action="/logout">
-          <button type="submit">Sign Out</button>
-        </form>
-          <% } else { %> 
-    <a href="http://localhost:8080/register">User Registration</a>
-          <br>
-    <a href="http://localhost:8080/login">User Login</a>
-         <% } %>              
+    <% if (user) { %>
+      <h3>USERNAME:
+        <%= user.email %>
+      </h3>
+      <form method="POST" action="/logout">
+        <button type="submit">Sign Out</button>
+      </form>
+      <% } else { %>
+        <a href="http://localhost:8080/register">User Registration</a>
+        <br>
+        <a href="http://localhost:8080/login">User Login</a>
+        <% } %>
   </header>
 </center>
